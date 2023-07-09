@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Chinook.Models
+@using Chinook.Services
+@using System.Security.Claims
+@using Chinook.StateContainers
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Chinook</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -15,23 +19,77 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-@* 
-            <NavLink class="nav-link" href="playlist/playlistnumber">
-                <i class="bi bi-music-note-list me-3" style="font-size: 1.25em"></i>My favorite tracks
-            </NavLink>
-*@
-</div>
+
+            @if (FavouritsPlaylist != null)
+            {
+
+                <NavLink class="nav-link" href="@($"playlist/{FavouritsPlaylist.PlaylistId}")">
+                    <i class="bi bi-music-note-list me-3" style="font-size: 1.25em"></i>My favorite tracks
+                </NavLink>
+            }
+            
+            @foreach(var playlist in OtherPlaylists)
+            {
+                <NavLink class="nav-link" href="@($"playlist/{playlist.PlaylistId}")">
+                    <i class="bi bi-music-note-list me-3" style="font-size: 1.25em"></i>@playlist.Name
+                </NavLink>
+            }
+
+        </div>
 
     </nav>
 </div>
 
 @code {
+    [Inject] PlaylistService PlaylistService { get; set; }
+    [Inject] NavStateContainer NavStateContainer { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
+    
     private bool collapseNavMenu = true;
-
+    private string CurrentUserId;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private Playlist? FavouritsPlaylist { get; set; }
+    private List<Playlist> OtherPlaylists { get; set; }
+    
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InvokeAsync(StateHasChanged);
+        CurrentUserId = await GetUserId();
+        
+        NavStateContainer.OnChange += ReRenderNavBar;
+
+        var allPlaylists = await PlaylistService.GetPlaylistsAsync(CurrentUserId);
+        
+        FavouritsPlaylist = allPlaylists.FirstOrDefault(p => p.Name == PlaylistService.FAVORITES_PLAYLIST_NAME);
+        OtherPlaylists = allPlaylists.Where(p => p.Name != PlaylistService.FAVORITES_PLAYLIST_NAME).ToList();
+    }
+
+    // This method is called when the state of the NavStateContainer changes
+    private void ReRenderNavBar()
+    {
+        var allPlaylists = PlaylistService.GetPlaylistsAsync(CurrentUserId).Result;
+        
+        FavouritsPlaylist = allPlaylists.FirstOrDefault(p => p.Name == PlaylistService.FAVORITES_PLAYLIST_NAME);
+        OtherPlaylists = allPlaylists.Where(p => p.Name != PlaylistService.FAVORITES_PLAYLIST_NAME).ToList();
+        StateHasChanged();
+    }
+    
+    private async Task<string> GetUserId()
+    {
+        var user = (await authenticationState).User;
+        var userId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
+        return userId;
+    }
+    
+    public void Dispose()
+    {
+        NavStateContainer.OnChange -= ReRenderNavBar;
+    }
+    
 }
