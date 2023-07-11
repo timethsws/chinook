@@ -51,8 +51,8 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
             entity.ToTable("Album");
 
             entity.HasIndex(e => e.ArtistId, "IFK_AlbumArtistId");
-
-            entity.Property(e => e.AlbumId).ValueGeneratedNever();
+            
+            entity.Property(e => e.AlbumId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Title).HasColumnType("NVARCHAR(160)");
 
@@ -66,7 +66,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
         {
             entity.ToTable("Artist");
 
-            entity.Property(e => e.ArtistId).ValueGeneratedNever();
+            entity.Property(e => e.ArtistId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Name).HasColumnType("NVARCHAR(120)");
         });
@@ -77,7 +77,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
 
             entity.HasIndex(e => e.SupportRepId, "IFK_CustomerSupportRepId");
 
-            entity.Property(e => e.CustomerId).ValueGeneratedNever();
+            entity.Property(e => e.CustomerId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Address).HasColumnType("NVARCHAR(70)");
 
@@ -112,7 +112,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
 
             entity.HasIndex(e => e.ReportsTo, "IFK_EmployeeReportsTo");
 
-            entity.Property(e => e.EmployeeId).ValueGeneratedNever();
+            entity.Property(e => e.EmployeeId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Address).HasColumnType("NVARCHAR(70)");
 
@@ -149,7 +149,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
         {
             entity.ToTable("Genre");
 
-            entity.Property(e => e.GenreId).ValueGeneratedNever();
+            entity.Property(e => e.GenreId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Name).HasColumnType("NVARCHAR(120)");
         });
@@ -160,7 +160,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
 
             entity.HasIndex(e => e.CustomerId, "IFK_InvoiceCustomerId");
 
-            entity.Property(e => e.InvoiceId).ValueGeneratedNever();
+            entity.Property(e => e.InvoiceId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.BillingAddress).HasColumnType("NVARCHAR(70)");
 
@@ -190,7 +190,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
 
             entity.HasIndex(e => e.TrackId, "IFK_InvoiceLineTrackId");
 
-            entity.Property(e => e.InvoiceLineId).ValueGeneratedNever();
+            entity.Property(e => e.InvoiceLineId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.UnitPrice).HasColumnType("NUMERIC(10,2)");
 
@@ -209,7 +209,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
         {
             entity.ToTable("MediaType");
 
-            entity.Property(e => e.MediaTypeId).ValueGeneratedNever();
+            entity.Property(e => e.MediaTypeId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Name).HasColumnType("NVARCHAR(120)");
         });
@@ -218,7 +218,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
         {
             entity.ToTable("Playlist");
 
-            entity.Property(e => e.PlaylistId).ValueGeneratedNever();
+            entity.Property(e => e.PlaylistId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Name).HasColumnType("NVARCHAR(120)");
 
@@ -248,7 +248,7 @@ public partial class ChinookContext : IdentityDbContext<ChinookUser>
 
             entity.HasIndex(e => e.MediaTypeId, "IFK_TrackMediaTypeId");
 
-            entity.Property(e => e.TrackId).ValueGeneratedNever();
+            entity.Property(e => e.TrackId).ValueGeneratedOnAdd();
 
             entity.Property(e => e.Composer).HasColumnType("NVARCHAR(220)");
 
